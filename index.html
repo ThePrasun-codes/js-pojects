@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Borrow &amp; Return Tracker</title>
+  <!-- Font Awesome icons (internet chahiye, nahi ho to icons nahi dikhenge par app chalega) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ===== Header ===== -->
+  <header>
+    <h1><i class="fa-solid fa-right-left"></i> Borrow &amp; Return Tracker</h1>
+    <p>Track items and money you have lent or borrowed, all in one place.</p>
+  </header>
+
+  <!-- ===== Summary cards ===== -->
+  <div class="summary">
+    <div class="summary-box">
+      <i class="fa-solid fa-layer-group blue"></i>
+      <p>Total Records</p>
+      <h2 id="totalCount">0</h2>
+    </div>
+    <div class="summary-box">
+      <i class="fa-solid fa-hourglass-half orange"></i>
+      <p>Pending Records</p>
+      <h2 id="pendingCount">0</h2>
+    </div>
+    <div class="summary-box">
+      <i class="fa-solid fa-circle-check green"></i>
+      <p>Returned / Paid Records</p>
+      <h2 id="returnedCount">0</h2>
+    </div>
+    <div class="summary-box">
+      <i class="fa-solid fa-box-open purple"></i>
+      <p>Total Items</p>
+      <h2 id="itemCount">0</h2>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- ===== Add Record form ===== -->
+    <div class="box form-box">
+      <h2>Add a record</h2>
+
+      <form id="addForm">
+        <label for="nameInput">Item / Amount</label>
+        <input type="text" id="nameInput" placeholder="e.g. Physics Book or ₹500">
+        <p class="error" id="nameError"></p>
+
+        <label for="personInput">Person Name</label>
+        <input type="text" id="personInput" placeholder="e.g. Rahul">
+        <p class="error" id="personError"></p>
+
+        <label for="categoryInput">Category</label>
+        <select id="categoryInput">
+          <option value="item">Item</option>
+          <option value="money">Money</option>
+        </select>
+
+        <label for="typeInput">Transaction Type</label>
+        <select id="typeInput">
+          <option value="lent">Lent</option>
+          <option value="borrowed">Borrowed</option>
+        </select>
+
+        <label for="statusInput">Status</label>
+        <select id="statusInput">
+          <option value="pending">Pending</option>
+          <option value="returned">Returned / Paid</option>
+        </select>
+
+        <button type="submit" class="btn blue-btn">Add Record</button>
+      </form>
+    </div>
+
+    <!-- ===== Records ===== -->
+    <div class="box list-box">
+      <h2>Records</h2>
+      <p id="resultText"></p>
+
+      <!-- Search and sort -->
+      <div class="top-row">
+        <input type="text" id="searchInput" placeholder="Search item, amount or person">
+        <select id="sortInput">
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+          <option value="az">Name A-Z</option>
+          <option value="za">Name Z-A</option>
+        </select>
+      </div>
+
+      <!-- Three separate filters (radio buttons) -->
+      <div class="filters">
+        <div class="filter-group">
+          <b>Category</b><br>
+          <label><input type="radio" name="category" value="all" checked> All</label>
+          <label><input type="radio" name="category" value="item"> Items</label>
+          <label><input type="radio" name="category" value="money"> Money</label>
+        </div>
+
+        <div class="filter-group">
+          <b>Transaction Type</b><br>
+          <label><input type="radio" name="type" value="all" checked> All</label>
+          <label><input type="radio" name="type" value="lent"> Lent</label>
+          <label><input type="radio" name="type" value="borrowed"> Borrowed</label>
+        </div>
+
+        <div class="filter-group">
+          <b>Status</b><br>
+          <label><input type="radio" name="status" value="all" checked> All</label>
+          <label><input type="radio" name="status" value="pending"> Pending</label>
+          <label><input type="radio" name="status" value="returned"> Returned / Paid</label>
+        </div>
+      </div>
+
+      <button type="button" class="btn gray-btn" id="clearBtn">Clear Filters</button>
+      <button type="button" class="btn red-btn" id="deleteAllBtn">Delete All Records</button>
+
+      <!-- Table (desktop) -->
+      <table id="recordTable">
+        <thead>
+          <tr>
+            <th>Item / Amount</th>
+            <th>Person</th>
+            <th>Category</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+
+      <!-- Cards (mobile) -->
+      <div id="cardList"></div>
+
+      <!-- Jab koi record na mile -->
+      <div id="emptyBox">
+        <i class="fa-solid fa-inbox"></i>
+        <h3 id="emptyTitle"></h3>
+        <p id="emptyText"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Edit box (pehle chhupa hota hai) ===== -->
+  <div id="editOverlay" class="hidden">
+    <div class="edit-box">
+      <h2>Edit Record</h2>
+
+      <label for="editName">Item / Amount</label>
+      <input type="text" id="editName">
+      <p class="error" id="editNameError"></p>
+
+      <label for="editPerson">Person Name</label>
+      <input type="text" id="editPerson">
+      <p class="error" id="editPersonError"></p>
+
+      <label for="editCategory">Category</label>
+      <select id="editCategory">
+        <option value="item">Item</option>
+        <option value="money">Money</option>
+      </select>
+
+      <label for="editType">Transaction Type</label>
+      <select id="editType">
+        <option value="lent">Lent</option>
+        <option value="borrowed">Borrowed</option>
+      </select>
+
+      <label for="editStatus">Status</label>
+      <select id="editStatus">
+        <option value="pending">Pending</option>
+        <option value="returned">Returned / Paid</option>
+      </select>
+
+      <button type="button" class="btn blue-btn" id="saveEditBtn">Save Changes</button>
+      <button type="button" class="btn gray-btn" id="cancelEditBtn">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Success / error message -->
+  <div id="message" class="hidden"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
